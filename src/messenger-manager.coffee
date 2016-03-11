@@ -8,13 +8,16 @@ class MessengerManager extends EventEmitter2
     @client.end true
 
   subscribe: (type, uuid, callback) =>
-    @uuidAliasResolver.resolve uuid =>
+    @uuidAliasResolver.resolve uuid, (error, uuid) =>
+      return callback error if error?
       channel = @_channel type, uuid
       @client.subscribe channel, callback
 
   unsubscribe: (type, uuid, callback) =>
-    channel = @_channel type, uuid
-    @client.unsubscribe channel, callback
+    @uuidAliasResolver.resolve uuid, (error, uuid) =>
+      return callback error if error?
+      channel = @_channel type, uuid
+      @client.unsubscribe channel, callback
 
   _channel: (type, uuid) =>
     "#{type}:#{uuid}"
