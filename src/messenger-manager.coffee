@@ -7,7 +7,10 @@ class MessengerManager extends EventEmitter2
     @client.on 'message', @_onMessage
 
   close: =>
-    return @client.quit() if @client.quit?
+    if @client.quit?
+      @client.quit =>
+        @client.disconnect()
+      return
     @client.end true
 
   subscribe: ({type, uuid, topics}, callback) =>
