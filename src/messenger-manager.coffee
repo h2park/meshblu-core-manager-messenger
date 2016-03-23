@@ -8,8 +8,8 @@ class MessengerManager extends EventEmitter2
 
   close: =>
     if @client.quit?
-      @client.quit =>
-        @client.disconnect()
+      @client.quit()
+      @client.disconnect false
       return
     @client.end true
 
