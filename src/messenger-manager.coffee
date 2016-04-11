@@ -7,7 +7,7 @@ class MessengerManager extends EventEmitter2
     @client.on 'message', @_onMessage
 
   close: =>
-    if @client.quit?
+    if @client.disconnect?
       @client.quit()
       @client.disconnect false
       return
