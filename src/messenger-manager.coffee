@@ -4,6 +4,8 @@ _ = require 'lodash'
 class MessengerManager extends EventEmitter2
   constructor: ({@client,@uuidAliasResolver}) ->
     @topicMap = {}
+    @client.once 'ready', =>
+      @emit 'ready'
     @client.on 'message', @_onMessage
 
   close: =>
