@@ -1,15 +1,17 @@
 uuid = require 'uuid'
-redis = require 'fakeredis'
+redis = require 'ioredis'
 MessengerManager = require '..'
 
 describe 'MessengerManager', ->
-  beforeEach ->
-    @redisKey = uuid.v1()
-    @client = redis.createClient @redisKey
+  beforeEach (done) ->
+    @client = redis.createClient()
     @uuidAliasResolver = resolve: (uuid, callback) => callback(null, uuid)
+    @client.on 'ready', done
 
-    messengerClient = redis.createClient @redisKey
+  beforeEach 'messenger client setup', (done) ->
+    messengerClient = redis.createClient()
     @sut = new MessengerManager {@uuidAliasResolver,client:messengerClient}
+    @sut.connect done
 
   context 'message', ->
     describe 'subscribe', ->
@@ -29,14 +31,14 @@ describe 'MessengerManager', ->
         @sut.once 'message', (@channel, @message) => done()
         @sut.subscribe type: 'sent', uuid: 'some-uuid', =>
           @client.publish 'sent:some-uuid', @nonce, (error) =>
-              return done error if error?
+            return done error if error?
 
       it 'should receive the first message', ->
         expect(@message).to.equal @nonce
 
       context 'when unsubscribed', ->
         beforeEach (done) ->
-          @sut.once 'message', (@channel, @secondMessage) => done()
+          @sut.once 'message', (@channel, @secondMessage) =>
           @sut.unsubscribe type: 'sent', uuid: 'some-uuid', =>
             @client.publish 'sent:some-uuid', @nonce, (error) =>
               return done error if error?
@@ -92,7 +94,7 @@ describe 'MessengerManager', ->
           topic: 'rears'
           nonce: @nonce
 
-        @sut.once 'message', (@channel, @message) => done()
+        @sut.once 'message', (@channel, @message) =>
         @sut.subscribe type: 'sent', uuid: 'some-uuid', topics: ['pears'], =>
           @client.publish 'sent:some-uuid', JSON.stringify(message), (error) =>
             return done error if error?
@@ -108,7 +110,7 @@ describe 'MessengerManager', ->
           topic: 'pears'
           nonce: @nonce
 
-        @sut.once 'message', (@channel, @message) => done()
+        @sut.once 'message', (@channel, @message) =>
         @sut.subscribe type: 'sent', uuid: 'some-uuid', topics: ['-pears'], =>
           @client.publish 'sent:some-uuid', JSON.stringify(message), (error) =>
             return done error if error?
