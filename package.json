@@ -1,6 +1,6 @@
 {
   "name": "meshblu-core-manager-messenger",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Meshblu Core Message Manager",
   "main": "index.js",
   "scripts": {

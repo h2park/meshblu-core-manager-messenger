@@ -7,13 +7,10 @@ class MessengerManager extends EventEmitter2
     @client.on 'message', @_onMessage
 
   connect: (callback) =>
-    @client.once 'ready', =>
+    @client.ping (error) =>
+      return callback error if error?
+      @client.on 'error', @_onError
       callback()
-      callback = ->
-
-    @client.once 'error', (error) =>
-      callback error
-      callback = ->
 
   close: =>
     if @client.disconnect?
@@ -56,6 +53,9 @@ class MessengerManager extends EventEmitter2
     "#{type}:#{uuid}"
 
   _defaultTopics: =>
+
+  _onError: (error) =>
+    @emit 'error', error
 
   _onMessage: (channel, messageStr) =>
     try
