@@ -5,11 +5,11 @@ class MessengerManager extends EventEmitter2
   constructor: ({@client,@uuidAliasResolver}) ->
     @topicMap = {}
     @client.on 'message', @_onMessage
+    @client.on 'error', @_onError
 
   connect: (callback) =>
     @client.ping (error) =>
       return callback error if error?
-      @client.on 'error', @_onError
       callback()
 
   close: =>
