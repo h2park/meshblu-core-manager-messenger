@@ -4,12 +4,12 @@ MessengerManager = require '..'
 
 describe 'MessengerManager', ->
   beforeEach (done) ->
-    @client = redis.createClient()
+    @client = redis.createClient dropBufferSupport: true
     @uuidAliasResolver = resolve: (uuid, callback) => callback(null, uuid)
     @client.on 'ready', done
 
   beforeEach 'messenger client setup', (done) ->
-    messengerClient = redis.createClient()
+    messengerClient = redis.createClient dropBufferSupport: true
     @sut = new MessengerManager {@uuidAliasResolver,client:messengerClient}
     @sut.connect done
 
