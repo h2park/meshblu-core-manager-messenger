@@ -15,9 +15,9 @@ class MessengerManager extends EventEmitter2
   close: =>
     @on 'error', (error) =>
       # silently ignore
-      
+
     if @client.disconnect?
-      @client.quit()
+      @client.quit => # ignore errors
       @client.disconnect false
       return
     @client.end true
